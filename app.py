@@ -26,7 +26,7 @@ def neo_miyako_auth():
     if session["state"] != request.args.get("state"):
         return "Authorization failed.", 401
     res_token = exchange_code(code=code, redirect_url=url_for("neo_miyako_auth", _external=True),
-                              client_id=718034684533145605, client_secret=FIVE_DON_BOT_SECRET, scope="identify")
+                              client_id=718034684533145605, client_secret=FIVE_DON_BOT_SECRET)
     token = res_token['access_token']
     res_info = requests.get(DISCORD_API_BASE_URL + 'users/@me', headers={'Authorization': f'Bearer {token}'})
     res_dict = res_info.json()
