@@ -25,7 +25,7 @@ def neo_miyako_auth():
                         f'%2F%2Fauth.alpaca131.com%2Fneo-miyako%2F2fa&response_type=code&scope=identify&state={state}')
     if session["state"] != request.args.get("state"):
         return "Authorization failed.", 401
-    res_token = exchange_code(code=code, redirect_url=url_for("neo_miyako_auth", _external=True),
+    res_token = exchange_code(code=code, redirect_url=url_for("neo_miyako_auth", _external=True, _scheme='https'),
                               client_id=718034684533145605, client_secret=FIVE_DON_BOT_SECRET)
     token = res_token['access_token']
     res_info = requests.get(DISCORD_API_BASE_URL + 'users/@me', headers={'Authorization': f'Bearer {token}'})
