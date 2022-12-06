@@ -12,6 +12,7 @@ FIVE_DON_BOT_SECRET = settings.FIVE_DON_BOT_SECRET
 FIVE_DON_BOT_TOKEN = settings.FIVE_DON_BOT_TOKEN
 
 DISCORD_API_BASE_URL = 'https://discord.com/api'
+API_ENDPOINT = 'https://discord.com/api/v10'
 
 
 @app.route('/neo-miyako/2fa')
@@ -42,19 +43,18 @@ def neo_miyako_auth():
     return "正常に付与されました。"
 
 
-def exchange_code(code, redirect_url, client_id, client_secret, scope=""):
+def exchange_code(code, redirect_url, client_id, client_secret):
     data = {
         'client_id': client_id,
         'client_secret': client_secret,
         'grant_type': 'authorization_code',
         'code': code,
-        'redirect_uri': redirect_url,
-        'scope': scope
+        'redirect_uri': redirect_url
     }
     headers = {
         'Content-Type': 'application/x-www-form-urlencoded'
     }
-    r = requests.post('https://discord.com/api/oauth2/token', data=data, headers=headers)
+    r = requests.post('%s/oauth2/token' % API_ENDPOINT, data=data, headers=headers)
     r.raise_for_status()
     return r.json()
 
