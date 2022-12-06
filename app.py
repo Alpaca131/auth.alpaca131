@@ -21,7 +21,7 @@ def neo_miyako_auth():
         state = random_strings(n=19)
         session['state'] = state
         return redirect(f'https://discord.com/api/oauth2/authorize?client_id=718034684533145605&redirect_uri=https%3A'
-                        f'%2F%2Fauth.alpaca131.com%2F2fa&response_type=code&scope=identify&state={state}')
+                        f'%2F%2Fauth.alpaca131.com%2Fneo-miyako%2F2fa&response_type=code&scope=identify&state={state}')
     if session["state"] != request.args.get("state"):
         return "Authorization failed.", 401
     res_token = exchange_code(code=code, redirect_url=url_for("neo_miyako_auth", _external=True),
