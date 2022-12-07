@@ -1,8 +1,9 @@
 import random
 import string
+from urllib import parse
 
 import requests
-from flask import Flask, request, redirect, session
+from flask import Flask, request, redirect, session, url_for
 
 import settings
 
@@ -11,7 +12,7 @@ app.config['SECRET_KEY'] = settings.SESSION_SECRET
 FIVE_DON_BOT_SECRET = settings.FIVE_DON_BOT_SECRET
 FIVE_DON_BOT_TOKEN = settings.FIVE_DON_BOT_TOKEN
 
-DISCORD_API_BASE_URL = 'https://discord.com/api'
+DISCORD_API_BASE_URL = 'https://discord.com/api/'
 API_ENDPOINT = 'https://discord.com/api/v10'
 
 
@@ -21,12 +22,12 @@ def neo_miyako_auth():
     if code is None:
         state = random_strings(n=19)
         session['state'] = state
-        return redirect(f'https://discord.com/api/oauth2/authorize?client_id=718034684533145605&redirect_uri=https%3A'
-                        f'%2F%2Fauth.alpaca131.com%2Fneo-miyako%2F2fa&response_type=code&scope=identify&state={state}')
+        return redirect(
+            f'https://discord.com/api/oauth2/authorize?client_id=718034684533145605&redirect_uri=https%3A%2F%2Fauth.alpaca131.com%2Fneo-miyako%2F2fa&response_type=code&scope=identify&state={state}')
     if session["state"] != request.args.get("state"):
         return "Authorization failed.", 401
-    res_token = exchange_code(code=code, redirect_url="https://auth.alpaca131.com/neo-miyako/2fa",
-                              client_id=718034684533145605, client_secret=FIVE_DON_BOT_SECRET)
+    res_token = exchange_code(code=code, redirect_url=url_for('neo_miyako_auth', _external=True),
+                              client_id=718034684533145605, client_secret=FIVE_DON_BOT_SECRET, scope="identify")
     token = res_token['access_token']
     res_info = requests.get(DISCORD_API_BASE_URL + 'users/@me', headers={'Authorization': f'Bearer {token}'})
     res_dict = res_info.json()
@@ -43,18 +44,19 @@ def neo_miyako_auth():
     return "正常に付与されました。"
 
 
-def exchange_code(code, redirect_url, client_id, client_secret):
+def exchange_code(code, redirect_url, client_id, client_secret, scope):
     data = {
         'client_id': client_id,
         'client_secret': client_secret,
-        'grant_type': 'authorization_code',
+        'grant_type': 'client_credentials',
         'code': code,
-        'redirect_uri': redirect_url
+        'redirect_uri': redirect_url,
+        'scope': scope
     }
     headers = {
         'Content-Type': 'application/x-www-form-urlencoded'
     }
-    r = requests.post('%s/oauth2/token' % API_ENDPOINT, data=data, headers=headers)
+    r = requests.post('https://discord.com/api/oauth2/token', data=parse.urlencode(data), headers=headers)
     r.raise_for_status()
     return r.json()
 
