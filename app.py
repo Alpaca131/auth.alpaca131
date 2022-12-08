@@ -7,11 +7,14 @@ from flask import Flask, request, redirect, session, url_for
 
 import settings
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = settings.SESSION_SECRET
+DEVELOPMENT = settings.DEVELOPMENT
 FIVE_DON_BOT_SECRET = settings.FIVE_DON_BOT_SECRET
 FIVE_DON_BOT_TOKEN = settings.FIVE_DON_BOT_TOKEN
-DEVELOPMENT = settings.DEVELOPMENT
+app = Flask(__name__)
+app.config['SECRET_KEY'] = settings.SESSION_SECRET
+if not DEVELOPMENT:
+    app.config["SERVER_NAME"] = "auth.alpaca131.com"
+
 
 DISCORD_API_BASE_URL = 'https://discord.com/api/'
 API_ENDPOINT = 'https://discord.com/api/v10'
