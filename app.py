@@ -49,7 +49,7 @@ def exchange_code(code, redirect_url, client_id, client_secret, scope):
     data = {
         'client_id': client_id,
         'client_secret': client_secret,
-        'grant_type': 'client_credentials',
+        'grant_type': 'authorization_code',
         'code': code,
         'redirect_uri': redirect_url,
         'scope': scope
