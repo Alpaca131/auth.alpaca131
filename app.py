@@ -11,6 +11,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = settings.SESSION_SECRET
 FIVE_DON_BOT_SECRET = settings.FIVE_DON_BOT_SECRET
 FIVE_DON_BOT_TOKEN = settings.FIVE_DON_BOT_TOKEN
+DEVELOPMENT = settings.DEVELOPMENT
 
 DISCORD_API_BASE_URL = 'https://discord.com/api/'
 API_ENDPOINT = 'https://discord.com/api/v10'
@@ -22,9 +23,13 @@ def neo_miyako_auth():
     if code is None:
         state = random_strings(n=19)
         session['state'] = state
-        return redirect(
-            f'https://discord.com/api/oauth2/authorize?client_id=718034684533145605&redirect_uri=https%3A%2F%2Fauth'
-            f'.alpaca131.com%2Fneo-miyako%2F2fa&response_type=code&scope=identify&state={state}')
+        if not DEVELOPMENT:
+            return redirect(
+                f'https://discord.com/api/oauth2/authorize?client_id=718034684533145605&redirect_uri=https%3A%2F%2Fauth'
+                f'.alpaca131.com%2Fneo-miyako%2F2fa&response_type=code&scope=identify&state={state}')
+        else:
+            return redirect(f"https://discord.com/api/oauth2/authorize?client_id=718034684533145605&redirect_uri=http%"
+                            f"3A%2F%2F100.85.179.122%3A5000%2Fneo-miyako%2F2fa&response_type=code&scope=identify&state={state}")
     if session["state"] != request.args.get("state"):
         return "Authorization failed.", 401
     res_token = exchange_code(code=code, redirect_url=url_for('neo_miyako_auth', _external=True),
