@@ -17,7 +17,7 @@ if not DEVELOPMENT:
 
 
 DISCORD_API_BASE_URL = 'https://discord.com/api/'
-API_ENDPOINT = 'https://discord.com/api/v10'
+API_ENDPOINT = 'https://discord.com/api/v10/'
 
 
 @app.route('/neo-miyako/2fa')
@@ -35,7 +35,7 @@ def neo_miyako_auth():
                             f"3A%2F%2F100.85.179.122%3A5000%2Fneo-miyako%2F2fa&response_type=code&scope=identify&state={state}")
     if session["state"] != request.args.get("state"):
         return "Authorization failed.", 401
-    res_token = exchange_code(code=code, redirect_url=url_for('neo_miyako_auth', _external=True),
+    res_token = exchange_code(code=code, redirect_url=url_for('neo_miyako_auth', _external=True, _scheme="https" if not DEVELOPMENT else "http"),
                               client_id=718034684533145605, client_secret=FIVE_DON_BOT_SECRET, scope="identify")
     token = res_token['access_token']
     res_info = requests.get(DISCORD_API_BASE_URL + 'users/@me', headers={'Authorization': f'Bearer {token}'})
